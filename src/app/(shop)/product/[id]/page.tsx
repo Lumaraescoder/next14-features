@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import Image from "next/image";
 
 type Product = {
@@ -13,7 +14,21 @@ type PageProps = {
   id: string
  }
 }
+//could be separated into a different file but I leave here for visualization
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+ const res = await fetch(`https://fakestoreapi.com/products/${params.id}`);
+ const product: Product = await res.json();
 
+ return {
+  title: `${product.title} | FakeStore`,
+  description: product.description,
+  openGraph: {
+   title: product.title,
+   description: product.description,
+   images: [product.image],
+  },
+ };
+}
 export default async function ProductPage({ params }: PageProps) {
  const res = await fetch(`https://fakestoreapi.com/products/${params.id}`, {
   cache: "no-store"
